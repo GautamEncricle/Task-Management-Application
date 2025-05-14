@@ -42,19 +42,20 @@ exports.getTasks = async (req, res, next) => {
 
 exports.updateTask = async (req, res) => {
     try {
-        const task = await Task.findOneAndUpdate(
-            { _id: req.params.id, assignedTo: req.user._id },
-            req.body,
-            { new: true, runValidators: true }
-        );
+        const { id } = req.params;
+        const task = await Task.findOne({ _id: id, assignedTo: req.user._id });
 
         if (!task) {
-            return res.status(404).json({ message: "Task not found" });
+            return res.status(404).json({ message: "Task not found or not authorized" });
         }
+        Object.assign(task, req.body);
+        await task.save();
 
         res.status(200).json({ task });
+
     } catch (err) {
-        res.status(500).json({ message: "Failed to update task", error: err.message });
+        console.error("Error during task update:", err.message);
+        res.status(500).json({ message: "Update failed", error: err.message });
     }
 };
 

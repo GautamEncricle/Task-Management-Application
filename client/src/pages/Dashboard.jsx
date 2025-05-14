@@ -3,13 +3,13 @@ import axios from "../api/axios"
 import { useAuth } from "../context/AuthContext"
 
 function Dashboard() {
-    const { user } = useAuth;
+    const { user } = useAuth();
     const [tasks, setTasks] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const statusCount = {
         backlog: 0,
-        "In-progress": 0,
+        "in-progress": 0,
         completed: 0,
     }
 
@@ -20,7 +20,6 @@ function Dashboard() {
             try {
                 const res = await axios.get("/tasks");
                 setTasks(res.data.tasks);
-                console.log(tasks)
             }
             catch (err) {
                 console.error("Failed to load tasks:", err);
