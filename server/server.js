@@ -7,43 +7,30 @@ const mongoose = require('mongoose');
 const authRouter = require("./routes/authRouters");
 const taskRouter = require("./routes/taskRouter");
 const adminRouter = require("./routes/adminRouter");
+const bodyParser = require('body-parser')
+
 
 const app = express();
 
-// CORS configuration
-// Update allowedOrigins array - make sure to include ALL frontend URLs
-const allowedOrigins = [
-    'http://localhost:5173',
-    'https://task-management-application-five-beta.vercel.app',
-    'https://task-management-application-91iz-iz8u5b9y7.vercel.app',
-    'https://task-management-application-mocha.vercel.app'
-];
-
-// Enhanced CORS middleware
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
-        if (!origin) return callback(null, true);
+    origin: [
+        'http://localhost:5173',
+        'https://task-management-application-five-beta.vercel.app',
+        'https://task-management-application-91iz-iz8u5b9y7.vercel.app',
+        'https://task-management-application-mocha.vercel.app'
 
-        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-            callback(null, true);
-        } else {
-            console.log("Blocked by CORS:", origin);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    exposedHeaders: ['Authorization'],
-    maxAge: 86400 // 24 hours
-}));
+}))
 
 // Handle preflight requests
 app.options('*', cors());
 
-app.use(express.json());
 app.use(cookieParser());
+app.use(express.json({ limit: '30mb', extended: true }))
+app.use(express.urlencoded({ limit: '30mb', extended: true }))
+app.use(bodyParser.urlencoded({ extended: true }))
 
 // API routes
 app.use('/api/auth', authRouter);
