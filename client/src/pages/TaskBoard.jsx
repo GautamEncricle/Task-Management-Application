@@ -2,6 +2,7 @@ import {
     DndContext,
     closestCenter,
     PointerSensor,
+    TouchSensor,
     useSensor,
     useSensors,
     useDroppable,
@@ -34,7 +35,7 @@ function TaskBoard() {
     const [filterDate, setFilterDate] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
 
-    const sensors = useSensors(useSensor(PointerSensor));
+const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor));
 
     useEffect(() => {
         const fetchTasks = async () => {
