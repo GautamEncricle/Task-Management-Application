@@ -62,7 +62,7 @@ exports.updateUserRole = async (req, res) => {
     }
 };
 
-// Roles and Permissions management (simple in-memory for now)
+// Roles and Permissions management 
 let roles = [
     { name: "admin", permissions: ["view", "edit", "delete", "assign"] },
     { name: "user", permissions: ["view", "edit"] },

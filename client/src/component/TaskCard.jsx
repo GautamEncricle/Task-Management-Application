@@ -2,7 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 import axios from "../api/axios";
-import { GripVertical } from "lucide-react"; // optional icon for drag handle
+import { GripVertical } from "lucide-react"; 
 
 function TaskCard({ id, task, onUpdate, onDelete }) {
     const {

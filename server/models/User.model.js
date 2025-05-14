@@ -4,18 +4,18 @@ const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
     name: {
-        type: String,  // Removed quotes
-        required: [true, 'Name is required']  // Fixed spelling
+        type: String,  
+        required: [true, 'Name is required'] 
     },
     email: {
         type: String,
         required: [true, 'Email is required'],
-        unique: true,  // Recommended to avoid duplicate emails
+        unique: true,  
         validate: {
-            validator: function (email) {  // Changed to normal function
+            validator: function (email) { 
                 return validator.isEmail(email);
             },
-            message: (props) => `${props.value} is not a valid email`  // Fixed `this` issue
+            message: (props) => `${props.value} is not a valid email`  
         }
     },
     password: {
