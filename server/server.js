@@ -10,10 +10,15 @@ const taskRouter = require("./routes/taskRouter");
 const adminRouter = require("./routes/adminRouter")
 const app = express();
 
-app.use(cors({
+/* app.use(cors({
     origin: process.env.CLIENT_URL || 'http://localhost:5173',
     credentials: true
-}));
+})); */
+
+app.use(cors({
+    origin: ['http://localhost:5173', 'https://task-management-application-91iz.vercel.app'],
+    credentials: true,
+}))
 app.use(express.json());
 app.use(cookieParser());
 app.use('/api/auth', authRouter);
