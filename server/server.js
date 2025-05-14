@@ -11,7 +11,7 @@ const adminRouter = require("./routes/adminRouter");
 const app = express();
 
 // CORS configuration
-// Update allowedOrigins array
+// Update allowedOrigins array - make sure to include ALL frontend URLs
 const allowedOrigins = [
     'http://localhost:5173',
     'https://task-management-application-five-beta.vercel.app',
@@ -25,18 +25,21 @@ app.use(cors({
         // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
 
-        if (allowedOrigins.includes(origin)) {
+        if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
             callback(null, true);
         } else {
+            console.log("Blocked by CORS:", origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Explicitly allow OPTIONS
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    exposedHeaders: ['Authorization']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Authorization'],
+    maxAge: 86400 // 24 hours
 }));
 
+// Handle preflight requests
 app.options('*', cors());
 
 app.use(express.json());
@@ -47,9 +50,13 @@ app.use('/api/auth', authRouter);
 app.use('/api/tasks', taskRouter);
 app.use('/api/admin', adminRouter);
 
-// Health check endpoint
+// Health check endpoint - useful for debugging connections
 app.get('/api/health', (req, res) => {
-    res.status(200).json({ status: 'ok' });
+    res.status(200).json({
+        status: 'ok',
+        environment: process.env.NODE_ENV,
+        timestamp: new Date().toISOString()
+    });
 });
 
 // Root route

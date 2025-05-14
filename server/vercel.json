@@ -18,16 +18,16 @@
         {
             "src": "/api/(.*)",
             "dest": "server.js",
-            "methods": [
-                "GET",
-                "POST",
-                "PUT",
-                "DELETE",
-                "OPTIONS"
-            ]
+            "headers": {
+                "Access-Control-Allow-Origin": "https://task-management-application-91iz-iz8u5b9y7.vercel.app",
+                "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Max-Age": "86400"
+            }
         },
         {
-            "src": "/",
+            "src": "/(.*)",
             "dest": "server.js"
         }
     ]
