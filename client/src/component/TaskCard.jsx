@@ -2,7 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useState } from "react";
 import axios from "../api/axios";
-import { GripVertical } from "lucide-react"; 
+import { GripVertical } from "lucide-react";
 
 function TaskCard({ id, task, onUpdate, onDelete }) {
     const {
@@ -57,12 +57,17 @@ function TaskCard({ id, task, onUpdate, onDelete }) {
             className="bg-white p-3 mb-2 rounded shadow border relative flex flex-col"
         >
             {/* Drag Handle */}
-            <div className="absolute top-1 left-2 cursor-grab" {...attributes} {...listeners}>
-                <GripVertical size={16} />
+            <div
+                className="absolute top-0 left-0 w-8 h-8 flex items-center justify-center touch-none"
+                {...attributes}
+                {...listeners}
+                style={{ touchAction: 'none', cursor: 'grab' }}
+            >
+                <GripVertical size={20} />
             </div>
 
             {isEditing ? (
-                <div className="mt-4"> {/* offset drag handle */}
+                <div className="mt-4">
                     <input
                         className="w-full font-semibold border-b mb-1"
                         value={editedTitle}
