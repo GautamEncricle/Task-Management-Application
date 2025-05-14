@@ -16,7 +16,9 @@ const app = express();
 })); */
 
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://task-management-application-91iz.vercel.app'],
+    origin: ['http://localhost:5173', process.env.FRONTEND_URL],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
 }))
 app.use(express.json());
