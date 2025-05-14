@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'https://task-management-application-five-beta.vercel.app/api', // Match your actual backend URL
+    baseURL: 'https://task-management-application-five-beta.vercel.app/api', // Must match your actual backend URL
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json'

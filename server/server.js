@@ -11,25 +11,33 @@ const adminRouter = require("./routes/adminRouter");
 const app = express();
 
 // CORS configuration
+// Update allowedOrigins array
 const allowedOrigins = [
     'http://localhost:5173',
     'https://task-management-application-five-beta.vercel.app',
     'https://task-management-application-91iz-iz8u5b9y7.vercel.app',
-    'https://task-management-application-mocha.vercel.app',
-    'https://task-management-application-git-main-username.vercel.app' 
+    'https://task-management-application-mocha.vercel.app'
 ];
 
+// Enhanced CORS middleware
 app.use(cors({
     origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            callback(new Error('CORS not allowed from this origin: ' + origin));
+            callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Explicitly allow OPTIONS
+    allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['Authorization']
 }));
+
+app.options('*', cors());
 
 app.use(express.json());
 app.use(cookieParser());
@@ -58,14 +66,14 @@ const connectDB = async () => {
         }
 
         await mongoose.connect(DB, {
-            serverSelectionTimeoutMS: 5000, 
-            socketTimeoutMS: 45000, 
-            connectTimeoutMS: 30000, 
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+            connectTimeoutMS: 30000,
         });
         console.log("✅ MongoDB connected");
     } catch (err) {
         console.error("❌ MongoDB connection error:", err);
-        process.exit(1); 
+        process.exit(1);
     }
 };
 
