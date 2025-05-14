@@ -1,10 +1,20 @@
 
 const User = require('../models/User.model');
 
-// Get all users - admin only
+// Get all users - admin only, with optional filtering by status, role, search
 exports.getUsers = async (req, res) => {
     try {
-        const users = await User.find().select('-password');
+        const { status, role, search } = req.query;
+        const filter = {};
+        if (status) filter.status = status;
+        if (role) filter.role = role;
+        if (search) {
+            filter.$or = [
+                { name: { $regex: search, $options: "i" } },
+                { email: { $regex: search, $options: "i" } }
+            ];
+        }
+        const users = await User.find(filter).select('-password');
         res.status(200).json({ users });
     } catch (error) {
         res.status(500).json({

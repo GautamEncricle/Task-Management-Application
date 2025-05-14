@@ -10,7 +10,7 @@ import {
     SortableContext,
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import axios from "../api/axios";
 import TaskCard from "../component/TaskCard";
 
@@ -29,6 +29,11 @@ function TaskBoard() {
     const [newTaskStatus, setNewTaskStatus] = useState("backlog");
     const [addingTask, setAddingTask] = useState(false);
 
+    // New search and filter states
+    const [searchTitle, setSearchTitle] = useState("");
+    const [filterDate, setFilterDate] = useState("");
+    const [filterStatus, setFilterStatus] = useState("");
+
     const sensors = useSensors(useSensor(PointerSensor));
 
     useEffect(() => {
@@ -43,15 +48,25 @@ function TaskBoard() {
         fetchTasks();
     }, []);
 
+    // Filter tasks based on search and filters
+    const filteredTasks = useMemo(() => {
+        return tasks.filter((task) => {
+            const matchesTitle = task.title.toLowerCase().includes(searchTitle.toLowerCase());
+            const matchesStatus = filterStatus ? task.status === filterStatus : true;
+            const matchesDate = filterDate ? new Date(task.createdAt).toISOString().slice(0,10) === filterDate : true;
+            return matchesTitle && matchesStatus && matchesDate;
+        });
+    }, [tasks, searchTitle, filterStatus, filterDate]);
+
     useEffect(() => {
         const grouped = {
             backlog: [],
             "in-progress": [],
             completed: [],
         };
-        tasks.forEach((task) => grouped[task.status].push(task));
+        filteredTasks.forEach((task) => grouped[task.status].push(task));
         setColumns(grouped);
-    }, [tasks]);
+    }, [filteredTasks]);
 
     const handleUpdateTask = (updatedTask) => {
         setTasks((prev) =>
@@ -137,26 +152,54 @@ function TaskBoard() {
         <div className="p-6">
             <h2 className="text-2xl font-bold mb-4 text-center">Task Board</h2>
 
+            <div className="mb-4 max-w-4xl mx-auto flex flex-col md:flex-row md:space-x-4 space-y-2 md:space-y-0">
+                <input
+                    type="text"
+                    placeholder="Search by title"
+                    value={searchTitle}
+                    onChange={(e) => setSearchTitle(e.target.value)}
+                    className="border rounded px-2 py-1 flex-grow"
+                />
+                <input
+                    type="date"
+                    value={filterDate}
+                    onChange={(e) => setFilterDate(e.target.value)}
+                    className="border rounded px-2 py-1"
+                />
+                <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    className="border rounded px-2 py-1"
+                >
+                    <option value="">All Categories</option>
+                    {STATUSES.map((status) => (
+                        <option key={status} value={status}>
+                            {status.charAt(0).toUpperCase() + status.slice(1)}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
             <div className="mb-6 border p-4 rounded shadow max-w-4xl mx-auto">
                 <h3 className="text-xl font-semibold mb-2">Add New Task</h3>
-                <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
+                <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0">
                     <input
                         type="text"
                         placeholder="Task title"
                         value={newTaskTitle}
                         onChange={(e) => setNewTaskTitle(e.target.value)}
-                        className="border rounded px-2 py-1 mb-2 md:mb-0 flex-grow"
+                        className="border rounded px-2 py-1 flex-grow"
                     />
                     <textarea
                         placeholder="Task description"
                         value={newTaskDescription}
                         onChange={(e) => setNewTaskDescription(e.target.value)}
-                        className="border rounded px-2 py-1 mb-2 md:mb-0 flex-grow"
+                        className="border rounded px-2 py-1 flex-grow"
                     />
                     <select
                         value={newTaskStatus}
                         onChange={(e) => setNewTaskStatus(e.target.value)}
-                        className="border rounded px-2 py-1 mb-2 md:mb-0"
+                        className="border rounded px-2 py-1"
                     >
                         {STATUSES.map((status) => (
                             <option key={status} value={status}>

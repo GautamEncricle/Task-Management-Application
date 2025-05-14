@@ -3,13 +3,19 @@ const Task = require('../models/Task.model');
 
 exports.createTask = async (req, res, next) => {
     try {
-        const { title, description, status } = req.body;
+        const { title, description, status, assignedTo } = req.body;
+
+        // If user is admin and assignedTo is provided, use it; else assign to req.user._id
+        let assignedUser = req.user._id;
+        if (req.user.role === 'admin' && assignedTo) {
+            assignedUser = assignedTo;
+        }
 
         const task = await Task.create({
             title,
             description,
             status,
-            assignedTo: req.user._id
+            assignedTo: assignedUser
         })
 
         res.status(201).json({

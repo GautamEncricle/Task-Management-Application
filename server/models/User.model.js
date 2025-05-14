@@ -29,6 +29,11 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['admin', 'user'],
         default: 'user'
+    },
+    status: {
+        type: String,
+        enum: ['active', 'inactive', 'pending'],
+        default: 'pending'
     }
 });
 
@@ -39,4 +44,4 @@ userSchema.pre('save', async function (next) {
 });
 
 const User = mongoose.model('User', userSchema);  
-module.exports = User; 
+module.exports = User;
