@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 
 const authRouter = require("./routes/authRouters");
+const taskRouter = require("./routes/taskRouter");
 const app = express();
 
 app.use(cors({
@@ -15,6 +16,7 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use('/api/auth', authRouter);
+app.use('/api/tasks', taskRouter);
 
 const PORT = process.env.PORT || 5000;
 const DB = process.env.DATABASE;

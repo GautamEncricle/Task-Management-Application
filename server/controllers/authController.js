@@ -19,7 +19,7 @@ exports.signup = async (req, res) => {
         const token = createToken(user._id);
 
         if (!token) {
-            return res.status(505).json({
+            return res.status(500).json({
                 statusCode: 'Error',
                 message: 'Something went wrong!'
             })
@@ -35,7 +35,7 @@ exports.signup = async (req, res) => {
         })
     }
     catch (error) {
-        res.status(505).json({
+        res.status(500).json({
             statusCode: "Error",
             error: `Something went wrong ${error}`
         })
@@ -65,7 +65,7 @@ exports.login = async (req, res, next) => {
 
         const token = createToken(user._id);
         if (!token) {
-            return res.status(505).json({
+            return res.status(500).json({
                 statusCode: 'Error',
                 message: 'Something went wrong!'
             })
@@ -87,7 +87,7 @@ exports.login = async (req, res, next) => {
         })
     }
     catch (error) {
-        res.status(505).json({
+        res.status(500).json({
             statusCode: "Error",
             error: `Something went wrong ${error}`
         })
