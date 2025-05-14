@@ -24,6 +24,11 @@ function TaskBoard() {
         completed: [],
     });
 
+    const [newTaskTitle, setNewTaskTitle] = useState("");
+    const [newTaskDescription, setNewTaskDescription] = useState("");
+    const [newTaskStatus, setNewTaskStatus] = useState("backlog");
+    const [addingTask, setAddingTask] = useState(false);
+
     const sensors = useSensors(useSensor(PointerSensor));
 
     useEffect(() => {
@@ -106,9 +111,69 @@ function TaskBoard() {
         return (prevTask.order + nextTask.order) / 2;
     };
 
+    const handleAddTask = async () => {
+        if (!newTaskTitle.trim()) {
+            alert("Task title cannot be empty");
+            return;
+        }
+        setAddingTask(true);
+        try {
+            const res = await axios.post("/tasks", {
+                title: newTaskTitle,
+                description: newTaskDescription,
+                status: newTaskStatus,
+            });
+            setTasks((prev) => [...prev, res.data.task]);
+            setNewTaskTitle("");
+            setNewTaskDescription("");
+            setNewTaskStatus("backlog");
+        } catch (err) {
+            alert("Failed to add task");
+        }
+        setAddingTask(false);
+    };
+
     return (
         <div className="p-6">
             <h2 className="text-2xl font-bold mb-4 text-center">Task Board</h2>
+
+            <div className="mb-6 border p-4 rounded shadow max-w-4xl mx-auto">
+                <h3 className="text-xl font-semibold mb-2">Add New Task</h3>
+                <div className="flex flex-col md:flex-row md:items-center md:space-x-4">
+                    <input
+                        type="text"
+                        placeholder="Task title"
+                        value={newTaskTitle}
+                        onChange={(e) => setNewTaskTitle(e.target.value)}
+                        className="border rounded px-2 py-1 mb-2 md:mb-0 flex-grow"
+                    />
+                    <textarea
+                        placeholder="Task description"
+                        value={newTaskDescription}
+                        onChange={(e) => setNewTaskDescription(e.target.value)}
+                        className="border rounded px-2 py-1 mb-2 md:mb-0 flex-grow"
+                    />
+                    <select
+                        value={newTaskStatus}
+                        onChange={(e) => setNewTaskStatus(e.target.value)}
+                        className="border rounded px-2 py-1 mb-2 md:mb-0"
+                    >
+                        {STATUSES.map((status) => (
+                            <option key={status} value={status}>
+                                {status.charAt(0).toUpperCase() + status.slice(1)}
+                            </option>
+                        ))}
+                    </select>
+                    <button
+                        onClick={handleAddTask}
+                        disabled={addingTask}
+                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                    >
+                        {addingTask ? "Adding..." : "Add Task"}
+                    </button>
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <DndContext
                     sensors={sensors}
