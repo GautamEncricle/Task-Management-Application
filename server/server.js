@@ -15,7 +15,8 @@ const allowedOrigins = [
     'http://localhost:5173',
     'https://task-management-application-five-beta.vercel.app',
     'https://task-management-application-91iz-iz8u5b9y7.vercel.app',
-    'https://task-management-application-mocha.vercel.app'
+    'https://task-management-application-mocha.vercel.app',
+    'https://task-management-application-git-main-username.vercel.app' 
 ];
 
 app.use(cors({
@@ -56,11 +57,15 @@ const connectDB = async () => {
             throw new Error("DATABASE environment variable not set!");
         }
 
-        await mongoose.connect(DB);
+        await mongoose.connect(DB, {
+            serverSelectionTimeoutMS: 5000, 
+            socketTimeoutMS: 45000, 
+            connectTimeoutMS: 30000, 
+        });
         console.log("✅ MongoDB connected");
     } catch (err) {
         console.error("❌ MongoDB connection error:", err);
-        return err;
+        process.exit(1); 
     }
 };
 

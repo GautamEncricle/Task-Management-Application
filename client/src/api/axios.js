@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'https://task-management-application-five-beta.vercel.app/api',
-    withCredentials: true, //make browser to access the cookie
+    baseURL: 'https://task-management-application-five-beta.vercel.app/api', // Match your actual backend URL
+    withCredentials: true,
     headers: {
         'Content-Type': 'application/json'
     }
