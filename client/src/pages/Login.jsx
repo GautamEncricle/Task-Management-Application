@@ -16,6 +16,7 @@ function Login() {
         e.preventDefault();
         try {
             const res = await axios.post("/auth/login", form);
+            // Store token in localStorage if needed, or rely on cookie
             localStorage.setItem("token", res.data.token);
             console.log(res.data);
             setUser(res.data.user);                            // Set user in context

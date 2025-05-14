@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const fetchUser = async (req, res) => {
             try {
-                const res = await axios.get('/protect/testing');
+                const res = await axios.get('/auth/protect/testing');
                 setUser(res.data.user);
             }
             catch (error) {
