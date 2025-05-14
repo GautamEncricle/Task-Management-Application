@@ -15,10 +15,22 @@ const app = express();
     credentials: true
 })); */
 
+const allowedOrigins = [
+    'http://localhost:5173',
+    'https://task-management-application-91iz-3whr3064d.vercel.app'
+];
+
 app.use(cors({
-    origin: ['http://localhost:5173', "https://task-management-application-91iz-3whr3064d.vercel.app"],
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('CORS not allowed from this origin: ' + origin));
+        }
+    },
     credentials: true,
-}))
+}));
+
 app.use(express.json());
 app.use(cookieParser());
 app.use('/api/auth', authRouter);
