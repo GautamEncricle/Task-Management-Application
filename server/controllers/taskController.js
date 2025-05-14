@@ -48,7 +48,12 @@ exports.updateTask = async (req, res) => {
         if (!task) {
             return res.status(404).json({ message: "Task not found or not authorized" });
         }
-        Object.assign(task, req.body);
+        // Update only provided fields individually to avoid overwriting required fields
+        for (const key in req.body) {
+            if (req.body.hasOwnProperty(key)) {
+                task[key] = req.body[key];
+            }
+        }
         await task.save();
 
         res.status(200).json({ task });
