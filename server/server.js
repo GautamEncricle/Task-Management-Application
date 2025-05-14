@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 
 const authRouter = require("./routes/authRouters");
 const taskRouter = require("./routes/taskRouter");
+const adminRouter = require("./routes/adminRouter")
 const app = express();
 
 app.use(cors({
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/tasks', taskRouter);
+app.use('/api/admin', adminRouter);
 
 const PORT = process.env.PORT || 5000;
 const DB = process.env.DATABASE;

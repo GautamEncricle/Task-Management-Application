@@ -31,6 +31,15 @@ function AdminUsers() {
         }
     };
 
+    const handleRoleChange = async (userId, newRole) => {
+        try {
+            await axios.put(`/admin/users/${userId}/role`, { role: newRole });
+            setUsers(users.map(user => user._id === userId ? { ...user, role: newRole } : user));
+        } catch (err) {
+            alert("Failed to update user role");
+        }
+    };
+
     if (loading) return <div className="p-4">Loading users...</div>;
     if (error) return <div className="p-4 text-red-600">{error}</div>;
 
@@ -50,9 +59,18 @@ function AdminUsers() {
                     <tbody>
                         {users.map((user) => (
                             <tr key={user._id} className="hover:bg-gray-100">
-                                <td className="py-2 px-4 border-b">{user.username}</td>
+                                <td className="py-2 px-4 border-b">{user.name}</td>
                                 <td className="py-2 px-4 border-b">{user.email}</td>
-                                <td className="py-2 px-4 border-b">{user.role}</td>
+                                <td className="py-2 px-4 border-b">
+                                    <select
+                                        value={user.role}
+                                        onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                                        className="border rounded px-2 py-1"
+                                    >
+                                        <option value="user">User</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </td>
                                 <td className="py-2 px-4 border-b">
                                     <button
                                         onClick={() => handleDelete(user._id)}
