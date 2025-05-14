@@ -16,7 +16,7 @@ const app = express();
 })); */
 
 app.use(cors({
-    origin: ['http://localhost:5173', 'https://task-management-application-91iz.vercel.app'],
+    origin: ['http://localhost:5173', "https://task-management-application-91iz-3whr3064d.vercel.app"],
     credentials: true,
 }))
 app.use(express.json());
