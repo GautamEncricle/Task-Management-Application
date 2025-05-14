@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'http://localhost:9000/api',
+    baseURL: import.meta.env.VITE_BACKEND_URL + '/api',
     withCredentials: true, //make browser to access the cookie
     headers: {
         'Content-Type': 'application/json'
