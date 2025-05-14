@@ -9,6 +9,7 @@ const taskRouter = require("./routes/taskRouter");
 const adminRouter = require("./routes/adminRouter");
 const bodyParser = require('body-parser')
 
+console.log("Environment:", process.env.NODE_ENV);
 
 const app = express();
 
