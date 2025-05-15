@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom"
 import Signup from "./pages/Signup"
 import Login from "./pages/Login"
 import Dashboard from "./pages/Dashboard"
-import ProtectedRoute from "./routes/ProtectedRoute"
+import AuthLayout from "./routes/AuthLayout"
 import TaskBoard from "./pages/TaskBoard"
 import Navigation from "./component/Navigation"
 import AdminUsers from "./pages/AdminUsers"
@@ -15,30 +15,11 @@ function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/Dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/tasks"
-          element={
-            <ProtectedRoute>
-              <TaskBoard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/users"
-          element={
-            <ProtectedRoute>
-              <AdminUsers />
-            </ProtectedRoute>
-          }
-        />
+        <Route element={<AuthLayout />}>
+          <Route path="/Dashboard" element={<Dashboard />} />
+          <Route path="/tasks" element={<TaskBoard />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+        </Route>
       </Routes>
     </>
   )
