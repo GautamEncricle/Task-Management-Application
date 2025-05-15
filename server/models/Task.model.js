@@ -17,16 +17,16 @@ const taskSchema = new mongoose.Schema({
         type: Date,
         default: Date.now()
     },
-    assignedTo: {
+    assignedTo: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true
-    },
+    }],
     order: {
         type: Number,
         default: 0,
     },
-})
+});
 
 const Task = mongoose.model('Task', taskSchema);
 module.exports = Task;

@@ -7,28 +7,36 @@ exports.createTask = catchAsync(async (req, res, next) => {
     const { title, description, status, assignedTo } = req.body;
 
     // If user is admin and assignedTo is provided, use it; else assign to req.user._id
-    let assignedUser = req.user._id;
+    let assignedUsers = [req.user._id];
     if (req.user.role === 'admin' && assignedTo) {
-        assignedUser = assignedTo;
+        if (Array.isArray(assignedTo)) {
+            assignedUsers = assignedTo;
+        } else {
+            assignedUsers = [assignedTo];
+        }
     }
 
     const task = await Task.create({
         title,
         description,
         status,
-        assignedTo: assignedUser
-    })
+        assignedTo: assignedUsers
+    });
 
     res.status(201).json({
         statusCode: 'Success',
         message: 'Task created successfully',
         task
-    })
-
-})
+    });
+});
 
 exports.getTasks = catchAsync(async (req, res, next) => {
-    const tasks = await Task.find({ assignedTo: req.user._id }).sort('-createdAt');
+    let tasks;
+    if (req.user.role === 'admin') {
+        tasks = await Task.find().sort('-createdAt').populate('assignedTo', 'name email');
+    } else {
+        tasks = await Task.find({ assignedTo: req.user._id }).sort('-createdAt').populate('assignedTo', 'name email');
+    }
     res.status(200).json({
         tasks
     })
@@ -64,5 +72,5 @@ exports.deleteTask = catchAsync(async (req, res, next) => {
         return res.status(404).json({ message: "Task not found" });
     }
 
-    res.status(200).json({ message: "Task deleted" }); s
+    res.status(200).json({ message: "Task deleted" });
 })

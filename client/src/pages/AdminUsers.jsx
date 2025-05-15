@@ -10,12 +10,13 @@ function AdminUsers() {
     const [search, setSearch] = useState("");
     const [filterRole, setFilterRole] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
+    const [taskSearch, setTaskSearch] = useState("");
 
     // New task form state
     const [newTaskTitle, setNewTaskTitle] = useState("");
     const [newTaskDescription, setNewTaskDescription] = useState("");
     const [newTaskStatus, setNewTaskStatus] = useState("backlog");
-    const [newTaskAssignedUser, setNewTaskAssignedUser] = useState("");
+    const [newTaskAssignedUsers, setNewTaskAssignedUsers] = useState([]);
     const [addingTask, setAddingTask] = useState(false);
 
     const fetchUsers = async () => {
@@ -75,13 +76,21 @@ function AdminUsers() {
         }
     };
 
+    const toggleUserSelection = (userId) => {
+        if (newTaskAssignedUsers.includes(userId)) {
+            setNewTaskAssignedUsers(newTaskAssignedUsers.filter(id => id !== userId));
+        } else {
+            setNewTaskAssignedUsers([...newTaskAssignedUsers, userId]);
+        }
+    };
+
     const handleCreateTask = async () => {
         if (!newTaskTitle.trim()) {
             alert("Task title cannot be empty");
             return;
         }
-        if (!newTaskAssignedUser) {
-            alert("Please select a user to assign the task");
+        if (newTaskAssignedUsers.length === 0) {
+            alert("Please select at least one user to assign the task");
             return;
         }
         setAddingTask(true);
@@ -90,13 +99,13 @@ function AdminUsers() {
                 title: newTaskTitle,
                 description: newTaskDescription,
                 status: newTaskStatus,
-                assignedTo: newTaskAssignedUser,
+                assignedTo: newTaskAssignedUsers,
             });
             alert("Task created and assigned");
             setNewTaskTitle("");
             setNewTaskDescription("");
             setNewTaskStatus("backlog");
-            setNewTaskAssignedUser("");
+            setNewTaskAssignedUsers([]);
             fetchUsers();
             fetchTasks();
         } catch (err) {
@@ -104,6 +113,10 @@ function AdminUsers() {
         }
         setAddingTask(false);
     };
+
+    const filteredTasks = tasks.filter(task =>
+        task.title.toLowerCase().includes(taskSearch.toLowerCase())
+    );
 
     if (loading) return <div className="p-4">Loading users...</div>;
     if (error) return <div className="p-4 text-red-600">{error}</div>;
@@ -200,7 +213,7 @@ function AdminUsers() {
             </div>
 
             <div className="border p-4 rounded shadow max-w-4xl mx-auto">
-                <h3 className="text-xl font-semibold mb-2">Create New Task for User</h3>
+                <h3 className="text-xl font-semibold mb-2">Create New Task for Users</h3>
                 <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-2 md:space-y-0">
                     <input
                         type="text"
@@ -224,18 +237,22 @@ function AdminUsers() {
                         <option value="in-progress">In Progress</option>
                         <option value="completed">Completed</option>
                     </select>
-                    <select
-                        value={newTaskAssignedUser}
-                        onChange={(e) => setNewTaskAssignedUser(e.target.value)}
-                        className="border rounded px-2 py-1"
-                    >
-                        <option value="">Select User</option>
+                    <div className="flex flex-wrap max-h-40 overflow-y-auto border rounded p-2 gap-2">
                         {users.map((user) => (
-                            <option key={user._id} value={user._id}>
+                            <button
+                                key={user._id}
+                                type="button"
+                                onClick={() => toggleUserSelection(user._id)}
+                                className={`px-3 py-1 rounded border ${
+                                    newTaskAssignedUsers.includes(user._id)
+                                        ? "bg-blue-600 text-white"
+                                        : "bg-white text-gray-700"
+                                }`}
+                            >
                                 {user.name}
-                            </option>
+                            </button>
                         ))}
-                    </select>
+                    </div>
                     <button
                         onClick={handleCreateTask}
                         disabled={addingTask}
@@ -244,6 +261,48 @@ function AdminUsers() {
                         {addingTask ? "Creating..." : "Create Task"}
                     </button>
                 </div>
+            </div>
+
+            <div className="border p-4 rounded shadow max-w-6xl mx-auto mt-6">
+                <h3 className="text-xl font-semibold mb-2">Tasks</h3>
+                <input
+                    type="text"
+                    placeholder="Search tasks by title"
+                    value={taskSearch}
+                    onChange={(e) => setTaskSearch(e.target.value)}
+                    className="border rounded px-2 py-1 mb-4 w-full max-w-md"
+                />
+                <table className="min-w-full bg-white border border-gray-300 rounded">
+                    <thead>
+                        <tr>
+                            <th className="py-2 px-4 border-b">Title</th>
+                            <th className="py-2 px-4 border-b">Description</th>
+                            <th className="py-2 px-4 border-b">Status</th>
+                            <th className="py-2 px-4 border-b">Assigned Users</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredTasks.map((task) => (
+                            <tr key={task._id} className="hover:bg-gray-100">
+                                <td className="py-2 px-4 border-b">{task.title}</td>
+                                <td className="py-2 px-4 border-b">{task.description}</td>
+                                <td className="py-2 px-4 border-b">{task.status.charAt(0).toUpperCase() + task.status.slice(1)}</td>
+                                <td className="py-2 px-4 border-b">
+                                    {task.assignedTo && task.assignedTo.length > 0
+                                        ? task.assignedTo.map(user => user.name).join(", ")
+                                        : "No users assigned"}
+                                </td>
+                            </tr>
+                        ))}
+                        {filteredTasks.length === 0 && (
+                            <tr>
+                                <td colSpan="4" className="text-center py-4">
+                                    No tasks found.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
         </div>
     );
