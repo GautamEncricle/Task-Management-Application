@@ -257,7 +257,7 @@ function Column({ id, tasks, onUpdate, onDelete }) {
     const sortedTasks = [...tasks].sort((a, b) => a.order - b.order);
 
     return (
-        <div ref={setNodeRef} className={`p-4 rounded shadow min-h-[300px] ${colorMap[id]}`}>
+        <div ref={setNodeRef} className={`p-4 rounded shadow h-96 overflow-y-auto ${colorMap[id]}`}>
             <h3 className="text-xl font-semibold mb-2">{titleMap[id]}</h3>
             <SortableContext items={sortedTasks.map((t) => t._id)} strategy={verticalListSortingStrategy}>
                 {sortedTasks.map((task) => (
