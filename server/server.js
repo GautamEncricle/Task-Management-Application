@@ -19,7 +19,7 @@ const app = express();
 app.use(cors({
     origin: ['http://localhost:5173', process.env.FRONTEND_URL, 'https://task-management-application-sepia-chi.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization'],  
     credentials: true,
 }))
 app.use(express.json());
