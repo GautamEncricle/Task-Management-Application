@@ -45,7 +45,12 @@ exports.getTasks = catchAsync(async (req, res, next) => {
 
 exports.updateTask = catchAsync(async (req, res, next) => {
     const { id } = req.params;
-    const task = await Task.findOne({ _id: id, assignedTo: req.user._id });
+    let task;
+    if (req.user.role === 'admin') {
+        task = await Task.findById(id);
+    } else {
+        task = await Task.findOne({ _id: id, assignedTo: req.user._id });
+    }
 
     if (!task) {
         return next(new AppError("Task not found or not authorized", 404));
@@ -61,12 +66,15 @@ exports.updateTask = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteTask = catchAsync(async (req, res, next) => {
-    const task = await Task.findOneAndDelete(
-        {
+    let task;
+    if (req.user.role === 'admin') {
+        task = await Task.findByIdAndDelete(req.params.id);
+    } else {
+        task = await Task.findOneAndDelete({
             _id: req.params.id,
             assignedTo: req.user._id
-        }
-    )
+        });
+    }
 
     if (!task) {
         return res.status(404).json({ message: "Task not found" });
