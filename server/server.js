@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 const authRouter = require("./routes/authRouters");
 const taskRouter = require("./routes/taskRouter");
 const adminRouter = require("./routes/adminRouter")
+const globalErrorHandler = require("./utils/globalErrorHandler");
 const app = express();
 
 /* app.use(cors({
@@ -29,6 +30,8 @@ app.use('/api/admin', adminRouter);
 
 const PORT = process.env.PORT || 5000;
 const DB = process.env.DATABASE;
+
+app.use(globalErrorHandler);
 
 if (!DB) {
     console.error("❌ DATABASE environment variable not set!");
