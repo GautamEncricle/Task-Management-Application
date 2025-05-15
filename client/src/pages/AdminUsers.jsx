@@ -19,6 +19,12 @@ function AdminUsers() {
     const [newTaskAssignedUsers, setNewTaskAssignedUsers] = useState([]);
     const [addingTask, setAddingTask] = useState(false);
 
+    // Task editing state
+    const [editingTaskId, setEditingTaskId] = useState(null);
+    const [editedTitle, setEditedTitle] = useState("");
+    const [editedDescription, setEditedDescription] = useState("");
+    const [editedStatus, setEditedStatus] = useState("backlog");
+
     const fetchUsers = async () => {
         try {
             const params = {};
@@ -48,7 +54,7 @@ function AdminUsers() {
         fetchTasks();
     }, [search, filterRole, filterStatus]);
 
-    const handleDelete = async (userId) => {
+    const handleDeleteUser = async (userId) => {
         if (!window.confirm("Are you sure you want to delete this user?")) return;
         try {
             await axios.delete(`/admin/users/${userId}`);
@@ -117,6 +123,46 @@ function AdminUsers() {
     const filteredTasks = tasks.filter(task =>
         task.title.toLowerCase().includes(taskSearch.toLowerCase())
     );
+
+    const startEditingTask = (task) => {
+        setEditingTaskId(task._id);
+        setEditedTitle(task.title);
+        setEditedDescription(task.description);
+        setEditedStatus(task.status);
+    };
+
+    const cancelEditing = () => {
+        setEditingTaskId(null);
+        setEditedTitle("");
+        setEditedDescription("");
+        setEditedStatus("backlog");
+    };
+
+    const handleUpdateTask = async () => {
+        try {
+            await axios.put(`/tasks/${editingTaskId}`, {
+                title: editedTitle,
+                description: editedDescription,
+                status: editedStatus,
+            });
+            alert("Task updated successfully");
+            cancelEditing();
+            fetchTasks();
+        } catch (err) {
+            alert("Failed to update task");
+        }
+    };
+
+    const handleDeleteTask = async (taskId) => {
+        if (!window.confirm("Are you sure you want to delete this task?")) return;
+        try {
+            await axios.delete(`/tasks/${taskId}`);
+            alert("Task deleted successfully");
+            fetchTasks();
+        } catch (err) {
+            alert("Failed to delete task");
+        }
+    };
 
     if (loading) return <div className="p-4">Loading users...</div>;
     if (error) return <div className="p-4 text-red-600">{error}</div>;
@@ -193,7 +239,7 @@ function AdminUsers() {
                                 </td>
                                 <td className="py-2 px-4 border-b">
                                     <button
-                                        onClick={() => handleDelete(user._id)}
+                                        onClick={() => handleDeleteUser(user._id)}
                                         className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
                                     >
                                         Delete
@@ -263,7 +309,7 @@ function AdminUsers() {
                 </div>
             </div>
 
-            <div className="border p-4 rounded shadow max-w-6xl mx-auto mt-6">
+            <div className="border p-4 rounded shadow max-w-6xl mx-auto mt-6 max-h-96 overflow-y-auto">
                 <h3 className="text-xl font-semibold mb-2">Tasks</h3>
                 <input
                     type="text"
@@ -279,24 +325,91 @@ function AdminUsers() {
                             <th className="py-2 px-4 border-b">Description</th>
                             <th className="py-2 px-4 border-b">Status</th>
                             <th className="py-2 px-4 border-b">Assigned Users</th>
+                            <th className="py-2 px-4 border-b">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {filteredTasks.map((task) => (
                             <tr key={task._id} className="hover:bg-gray-100">
-                                <td className="py-2 px-4 border-b">{task.title}</td>
-                                <td className="py-2 px-4 border-b">{task.description}</td>
-                                <td className="py-2 px-4 border-b">{task.status.charAt(0).toUpperCase() + task.status.slice(1)}</td>
-                                <td className="py-2 px-4 border-b">
-                                    {task.assignedTo && task.assignedTo.length > 0
-                                        ? task.assignedTo.map(user => user.name).join(", ")
-                                        : "No users assigned"}
-                                </td>
+                                {editingTaskId === task._id ? (
+                                    <>
+                                        <td className="py-2 px-4 border-b">
+                                            <input
+                                                type="text"
+                                                value={editedTitle}
+                                                onChange={(e) => setEditedTitle(e.target.value)}
+                                                className="border rounded px-2 py-1 w-full"
+                                            />
+                                        </td>
+                                        <td className="py-2 px-4 border-b">
+                                            <textarea
+                                                value={editedDescription}
+                                                onChange={(e) => setEditedDescription(e.target.value)}
+                                                className="border rounded px-2 py-1 w-full"
+                                            />
+                                        </td>
+                                        <td className="py-2 px-4 border-b">
+                                            <select
+                                                value={editedStatus}
+                                                onChange={(e) => setEditedStatus(e.target.value)}
+                                                className="border rounded px-2 py-1 w-full"
+                                            >
+                                                <option value="backlog">Backlog</option>
+                                                <option value="in-progress">In Progress</option>
+                                                <option value="completed">Completed</option>
+                                            </select>
+                                        </td>
+                                        <td className="py-2 px-4 border-b">
+                                            {task.assignedTo && task.assignedTo.length > 0
+                                                ? task.assignedTo.map(user => user.name).join(", ")
+                                                : "No users assigned"}
+                                        </td>
+                                        <td className="py-2 px-4 border-b flex gap-2">
+                                            <button
+                                                onClick={handleUpdateTask}
+                                                className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+                                            >
+                                                Save
+                                            </button>
+                                            <button
+                                                onClick={cancelEditing}
+                                                className="bg-gray-300 px-3 py-1 rounded hover:bg-gray-400"
+                                            >
+                                                Cancel
+                                            </button>
+                                        </td>
+                                    </>
+                                ) : (
+                                    <>
+                                        <td className="py-2 px-4 border-b">{task.title}</td>
+                                        <td className="py-2 px-4 border-b">{task.description}</td>
+                                        <td className="py-2 px-4 border-b">{task.status.charAt(0).toUpperCase() + task.status.slice(1)}</td>
+                                        <td className="py-2 px-4 border-b">
+                                            {task.assignedTo && task.assignedTo.length > 0
+                                                ? task.assignedTo.map(user => user.name).join(", ")
+                                                : "No users assigned"}
+                                        </td>
+                                        <td className="py-2 px-4 border-b flex gap-2">
+                                            <button
+                                                onClick={() => startEditingTask(task)}
+                                                className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                            >
+                                                Update
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteTask(task._id)}
+                                                className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </>
+                                )}
                             </tr>
                         ))}
                         {filteredTasks.length === 0 && (
                             <tr>
-                                <td colSpan="4" className="text-center py-4">
+                                <td colSpan="5" className="text-center py-4">
                                     No tasks found.
                                 </td>
                             </tr>
