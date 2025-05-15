@@ -42,6 +42,21 @@ exports.updateUserRole = catchAsync(async (req, res, next) => {
     res.status(200).json({ message: "User role updated", user });
 });
 
+// Update user status - admin only
+exports.updateUserStatus = catchAsync(async (req, res, next) => {
+    const { status } = req.body;
+    if (!['active', 'inactive', 'pending'].includes(status)) {
+        return next(new AppError("Invalid status", 400));
+    }
+    const user = await User.findById(req.params.id);
+    if (!user) {
+        return next(new AppError("User not found", 404));
+    }
+    user.status = status;
+    await user.save();
+    res.status(200).json({ message: "User status updated", user });
+});
+
 // Roles and Permissions management 
 let roles = [
     { name: "admin", permissions: ["view", "edit", "delete", "assign"] },

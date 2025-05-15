@@ -1,15 +1,37 @@
-import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useRef, useState, useEffect } from "react";
 
 function Navigation() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
+    const [adminDropdownOpen, setAdminDropdownOpen] = useState(false);
+    const adminDropdownRef = useRef(null);
 
     const handleLogout = () => {
         logout();
         navigate("/login");
     };
+
+    const toggleAdminDropdown = () => {
+        setAdminDropdownOpen((prev) => !prev);
+    };
+
+    // Close dropdown if clicked outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                adminDropdownRef.current &&
+                !adminDropdownRef.current.contains(event.target)
+            ) {
+                setAdminDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     return (
         <nav className="bg-gray-800 text-white p-4 flex flex-col md:flex-row md:items-center md:justify-between">
@@ -34,7 +56,12 @@ function Navigation() {
                         viewBox="0 0 24 24"
                         xmlns="http://www.w3.org/2000/svg"
                     >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 6h16M4 12h16M4 18h16"
+                        />
                     </svg>
                 </button>
             </div>
@@ -43,7 +70,10 @@ function Navigation() {
                 id="mobile-menu"
                 className="hidden md:flex flex-col md:flex-row md:items-center md:space-x-6 mt-4 md:mt-0"
             >
-                <Link to="/Dashboard" className="block px-2 py-1 hover:bg-gray-700 rounded">
+                <Link
+                    to="/Dashboard"
+                    className="block px-2 py-1 hover:bg-gray-700 rounded"
+                >
                     Dashboard
                 </Link>
                 <Link to="/tasks" className="block px-2 py-1 hover:bg-gray-700 rounded">
@@ -53,11 +83,19 @@ function Navigation() {
                 {user?.role === "admin" && (
                     <>
                         <div className="border-t border-gray-700 my-2 md:hidden"></div>
-                        <div className="relative group">
-                            <button className="block px-2 py-1 hover:bg-gray-700 rounded w-full text-left md:w-auto">
+                        <div className="relative" ref={adminDropdownRef}>
+                            <button
+                                onClick={toggleAdminDropdown}
+                                className="block px-2 py-1 hover:bg-gray-700 rounded w-full text-left md:w-auto"
+                                aria-haspopup="true"
+                                aria-expanded={adminDropdownOpen}
+                            >
                                 Admin
                             </button>
-                            <div className="absolute left-0 mt-1 w-48 bg-gray-700 rounded shadow-lg hidden group-hover:block z-10">
+                            <div
+                                className={`absolute left-0 mt-1 w-48 bg-gray-700 rounded shadow-lg z-10 ${adminDropdownOpen ? "block" : "hidden"
+                                    }`}
+                            >
                                 <Link
                                     to="/admin/users"
                                     className="block px-4 py-2 hover:bg-gray-600 rounded"
