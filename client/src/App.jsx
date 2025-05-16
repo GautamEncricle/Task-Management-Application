@@ -10,7 +10,6 @@ import AdminUsers from "./pages/AdminUsers"
 function App() {
   return (
     <>
-      <Navigation />
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/signup" element={<Signup />} />
